@@ -203,9 +203,9 @@ function init() {
                 ScrollTrigger.refresh();
             }
         })
-        .from('.loader span', { opacity: 0, y: 20, duration: 0.4 })
-        .to('.loader span', { opacity: 0, y: -16, duration: 0.32 }, '+=0.1')
-        .to('.loader', { clipPath: 'inset(0% 0% 100% 0%)', duration: 0.75, ease: 'power3.inOut' }, '<0.08');
+            .from('.loader span', { opacity: 0, y: 20, duration: 0.4 })
+            .to('.loader span', { opacity: 0, y: -16, duration: 0.32 }, '+=0.1')
+            .to('.loader', { clipPath: 'inset(0% 0% 100% 0%)', duration: 0.75, ease: 'power3.inOut' }, '<0.08');
 
         // Hero Typography & Portrait Scale
         mm.add('(min-width: 1px)', () => {
@@ -220,7 +220,7 @@ function init() {
                 ease: 'none',
                 scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
             });
-            return () => {};
+            return () => { };
         });
 
         // SplitText Roll & Scatter
@@ -328,8 +328,8 @@ function init() {
                     }
                 }
             })
-            .to(path, { strokeDashoffset: 0, strokeWidth: 25, duration: 0.6, ease: 'none' }, 0)
-            .to(path, { strokeWidth: 540, duration: 0.8, ease: 'none' }, 0.2);
+                .to(path, { strokeDashoffset: 0, strokeWidth: 25, duration: 0.6, ease: 'none' }, 0)
+                .to(path, { strokeWidth: 540, duration: 0.8, ease: 'none' }, 0.2);
         }
 
         // Services Horizontal Scroll (Desktop)
@@ -377,9 +377,9 @@ function init() {
 
             items.slice(0, -1).forEach((item, i) => {
                 tl.to(visuals[i], { height: 0, duration: 1, ease: 'none' }, i)
-                  .to(imgs[i], { left: '100%', width: '0%', duration: 1, ease: 'none' }, i)
-                  .to(imgs[i + 1], { left: '29%', width: '71%', duration: 1, ease: 'none' }, i)
-                  .to('.services-list', { y: -rowHeights.slice(0, i + 1).reduce((sum, h) => sum + h, 0), duration: 1, ease: 'none' }, i);
+                    .to(imgs[i], { left: '100%', width: '0%', duration: 1, ease: 'none' }, i)
+                    .to(imgs[i + 1], { left: '29%', width: '71%', duration: 1, ease: 'none' }, i)
+                    .to('.services-list', { y: -rowHeights.slice(0, i + 1).reduce((sum, h) => sum + h, 0), duration: 1, ease: 'none' }, i);
             });
 
             return () => {
@@ -467,15 +467,15 @@ function init() {
                     duration: 0.18,
                     ease: 'power1.inOut'
                 }, at)
-                .to(word, {
-                    x: x * 1.15 + 'vw',
-                    y: y * 1.15 + 'vh',
-                    z: 900,
-                    scale: 1.4,
-                    opacity: 0,
-                    duration: 0.18,
-                    ease: 'power1.in'
-                }, at + 0.18);
+                    .to(word, {
+                        x: x * 1.15 + 'vw',
+                        y: y * 1.15 + 'vh',
+                        z: 900,
+                        scale: 1.4,
+                        opacity: 0,
+                        duration: 0.18,
+                        ease: 'power1.in'
+                    }, at + 0.18);
             }
         }
 
@@ -589,31 +589,31 @@ function triggerServicePaintTransition({ tag = '[ service ]', title = "LET'S TAL
         duration: 0.46,
         ease: 'power2.inOut'
     }, 0)
-    // 2. Animate tag & title in smoothly
-    .to(curtainContent, {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.25,
-        ease: 'power3.out'
-    }, 0.18)
-    // 3. Peak: screen is fully covered in blue -> reveal destination modal immediately
-    .add(() => {
-        if (onPeak) onPeak();
-    }, 0.44)
-    // 4. Brief hold
-    .to(curtainContent, {
-        opacity: 0,
-        y: -14,
-        duration: 0.18,
-        ease: 'power2.in'
-    }, '+=0.18')
-    // 5. Fade out blue curtain seamlessly
-    .to(curtain, {
-        opacity: 0,
-        duration: 0.3,
-        ease: 'power2.out'
-    }, '-=0.04');
+        // 2. Animate tag & title in smoothly
+        .to(curtainContent, {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.25,
+            ease: 'power3.out'
+        }, 0.18)
+        // 3. Peak: screen is fully covered in blue -> reveal destination modal immediately
+        .add(() => {
+            if (onPeak) onPeak();
+        }, 0.44)
+        // 4. Brief hold
+        .to(curtainContent, {
+            opacity: 0,
+            y: -14,
+            duration: 0.18,
+            ease: 'power2.in'
+        }, '+=0.18')
+        // 5. Fade out blue curtain seamlessly
+        .to(curtain, {
+            opacity: 0,
+            duration: 0.3,
+            ease: 'power2.out'
+        }, '-=0.04');
 }
 
 function openContactModal() {
