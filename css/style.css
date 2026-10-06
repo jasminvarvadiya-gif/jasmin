@@ -151,7 +151,8 @@ img {
     isolation: isolate;
     align-items: center;
     justify-content: center;
-    min-height: 50px
+    min-height: 50px;
+    transition: transform .25s ease, color .3s ease;
 }
 
 .button span {
@@ -174,7 +175,12 @@ img {
 }
 
 .button:hover {
-    color: var(--ink)
+    color: var(--ink);
+    transform: translateY(-2px);
+}
+
+.button:active {
+    transform: translateY(0) scale(0.98);
 }
 
 .button.black {
@@ -706,27 +712,46 @@ img {
 
 .contact-content {
     position: relative;
-    z-index: 2;
+    z-index: 10;
     display: flex;
     align-items: center;
     text-align: center;
     flex-direction: column;
     gap: 32px;
-    width: min(90%, 800px)
+    width: min(90%, 800px);
 }
 
 .contact-content h2 {
     font-size: clamp(65px, 13vw, 190px);
-    line-height: .85
+    line-height: .85;
 }
 
 .contact-content p {
-    max-width: 530px
+    max-width: 530px;
 }
 
 .buttons {
     display: flex;
-    gap: 16px
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 15;
+}
+
+.contact .button.black {
+    background: transparent;
+    border: 1px solid rgba(226, 225, 225, 0.4);
+    color: var(--silver);
+}
+
+.contact .button.black:before {
+    background: var(--silver);
+}
+
+.contact .button.black:hover {
+    color: var(--ink);
+    border-color: var(--silver);
 }
 
 .contact-words {
@@ -734,7 +759,7 @@ img {
     inset: 0;
     pointer-events: none;
     transform-style: preserve-3d;
-    z-index: 3
+    z-index: 1;
 }
 
 .contact-word {
@@ -746,7 +771,9 @@ img {
     font-weight: 700;
     line-height: 1;
     will-change: transform;
-    opacity: 0
+    opacity: 0;
+    pointer-events: none;
+    user-select: none;
 }
 
 .footer-wrap {
