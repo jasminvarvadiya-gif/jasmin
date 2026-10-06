@@ -112,140 +112,62 @@ function init() {
 const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
 Promise.race([fontsReady, new Promise(r => setTimeout(r, 1200))]).then(init).catch(() => { const l = $('.loader'); if (l) l.style.display = 'none'; });
 
-// Contact Modal & Service Paint Transition (Used for both "Let's talk" and "Submit")
-let isTransitioning = false;
-
-function triggerServicePaintTransition({ tag = '[ service ]', title = "LET'S TALK [JV]", onPeak, onComplete }) {
-    if (isTransitioning) return;
-    isTransitioning = true;
-    if (window.lenis) lenis.stop();
-
-    const curtain = $('#contactCurtain');
-    const paintPath = $('#contactCurtain .curtain-paint path');
-    const curtainContent = $('#curtainContent');
-    const tagEl = $('#curtainTag');
-    const titleEl = $('#curtainTitle');
-
-    if (!curtain || !paintPath) {
-        if (onPeak) onPeak();
-        if (onComplete) onComplete();
-        isTransitioning = false;
-        return;
-    }
-
-    if (tagEl) tagEl.textContent = tag;
-    if (titleEl) titleEl.textContent = title;
-
-    if (!window.gsap || reduced) {
-        if (onPeak) onPeak();
-        if (onComplete) onComplete();
-        isTransitioning = false;
-        return;
-    }
-
-    const pathLength = paintPath.getTotalLength ? paintPath.getTotalLength() : 3800;
-
-    gsap.set(curtain, { display: 'flex', opacity: 1 });
-    gsap.set(paintPath, {
-        strokeDasharray: pathLength,
-        strokeDashoffset: pathLength,
-        strokeWidth: 20
-    });
-    gsap.set(curtainContent, { opacity: 0, y: 30, scale: 0.96 });
-
-    const tl = gsap.timeline({
-        onComplete: () => {
-            gsap.set(curtain, { display: 'none', opacity: 1 });
-            isTransitioning = false;
-            if (onComplete) onComplete();
-        }
-    });
-
-    // 1. Service section paint stroke sweep & expand (identical to manifesto)
-    tl.to(paintPath, {
-        strokeDashoffset: 0,
-        duration: 0.65,
-        ease: 'power2.inOut'
-    }, 0)
-        .to(paintPath, {
-            strokeWidth: 540,
-            duration: 0.6,
-            ease: 'power2.out'
-        }, 0.15)
-        // 2. Animate in the service section title & tag
-        .to(curtainContent, {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.35,
-            ease: 'power3.out'
-        }, 0.3)
-        // 3. Peak: full blue coverage reached -> trigger midpoint actions
-        .add(() => {
-            if (onPeak) onPeak();
-        }, 0.65)
-        // 4. Brief hold so user comfortably reads tag & title
-        .to(curtainContent, {
-            opacity: 0,
-            y: -22,
-            duration: 0.3,
-            ease: 'power2.in'
-        }, '+=0.35')
-        // 5. Fade out the blue curtain to smoothly reveal the destination
-        .to(curtain, {
-            opacity: 0,
-            duration: 0.45,
-            ease: 'power2.out'
-        }, '-=0.05');
-}
-
+// Contact Modal Dialog Controls
 function openContactModal() {
     const modal = $('#contactModal');
     if (!modal) return;
 
-    // Completely lock background scrolling
-    document.body.classList.add('modal-open');
-    document.documentElement.classList.add('modal-open');
     if (window.lenis) lenis.stop();
+    document.body.classList.add('modal-open');
 
-    triggerServicePaintTransition({
-        tag: '[ service ]',
-        title: "LET'S TALK [JV]",
-        onPeak: () => {
-            modal.removeAttribute('hidden');
-            gsap.fromTo('.contact-modal-dialog',
-                { scale: 0.92, opacity: 0, y: 25 },
-                { scale: 1, opacity: 1, y: 0, duration: 0.45, ease: 'power3.out' }
-            );
-            gsap.fromTo('.contact-modal-backdrop',
-                { opacity: 0 },
-                { opacity: 1, duration: 0.35 }
-            );
-            const firstInput = $('#formName');
-            if (firstInput) firstInput.focus();
-        }
-    });
+    modal.removeAttribute('hidden');
+
+    if (window.gsap && !reduced) {
+        gsap.killTweensOf(['.contact-modal-dialog', '.contact-modal-backdrop']);
+        gsap.fromTo('.contact-modal-backdrop',
+            { opacity: 0 },
+            { opacity: 1, duration: 0.25, ease: 'power2.out' }
+        );
+        gsap.fromTo('.contact-modal-dialog',
+            { scale: 0.95, opacity: 0, y: 15 },
+            { 
+                scale: 1, 
+                opacity: 1, 
+                y: 0, 
+                duration: 0.3, 
+                ease: 'power3.out',
+                onComplete: () => {
+                    const firstInput = $('#formName');
+                    if (firstInput) firstInput.focus();
+                }
+            }
+        );
+    } else {
+        const firstInput = $('#formName');
+        if (firstInput) firstInput.focus();
+    }
 }
 
 function closeContactModal() {
     const modal = $('#contactModal');
-    if (!modal || modal.hasAttribute('hidden') || isTransitioning) return;
+    if (!modal || modal.hasAttribute('hidden')) return;
 
     if (window.gsap && !reduced) {
+        gsap.killTweensOf(['.contact-modal-dialog', '.contact-modal-backdrop']);
         gsap.to('.contact-modal-dialog', {
-            scale: 0.94,
+            scale: 0.96,
             opacity: 0,
-            y: 15,
-            duration: 0.22,
+            y: 10,
+            duration: 0.2,
             ease: 'power2.in'
         });
         gsap.to('.contact-modal-backdrop', {
             opacity: 0,
-            duration: 0.22,
+            duration: 0.2,
+            ease: 'power2.in',
             onComplete: () => {
                 modal.setAttribute('hidden', '');
                 document.body.classList.remove('modal-open');
-                document.documentElement.classList.remove('modal-open');
                 if (window.lenis) lenis.start();
                 const status = $('#formStatus');
                 if (status) status.textContent = '';
@@ -254,7 +176,6 @@ function closeContactModal() {
     } else {
         modal.setAttribute('hidden', '');
         document.body.classList.remove('modal-open');
-        document.documentElement.classList.remove('modal-open');
         if (window.lenis) lenis.start();
     }
 }
@@ -301,30 +222,24 @@ if (modalContainer) {
     }, { passive: false });
 }
 
-// Handle form submit: run the exact same service paint stroke transition on submit
+// Handle form submit
 const contactForm = $('#contactForm');
 if (contactForm) {
     contactForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const submitBtn = $('#submitBtn');
-        const nameVal = $('#formName') && $('#formName').value.trim() ? $('#formName').value.trim() : 'Friend';
-
+        const status = $('#formStatus');
+        
         if (submitBtn) submitBtn.disabled = true;
+        if (status) {
+            status.className = 'form-status success';
+            status.textContent = 'Message sent successfully! Thank you.';
+        }
 
-        triggerServicePaintTransition({
-            tag: '[ service ]',
-            title: `THANK YOU! [JV]`,
-            onPeak: () => {
-                const modal = $('#contactModal');
-                if (modal) modal.setAttribute('hidden', '');
-                contactForm.reset();
-                if (submitBtn) submitBtn.disabled = false;
-            },
-            onComplete: () => {
-                document.body.classList.remove('modal-open');
-                document.documentElement.classList.remove('modal-open');
-                if (window.lenis) lenis.start();
-            }
-        });
+        setTimeout(() => {
+            closeContactModal();
+            contactForm.reset();
+            if (submitBtn) submitBtn.disabled = false;
+        }, 1200);
     });
 }
