@@ -132,6 +132,9 @@ function init() {
     renderOrbit(false);
     if (!window.gsap || !window.ScrollTrigger) return;
 
+    const activeDarkSections = new Set();
+    let manifestoDark = false;
+
     gsap.registerPlugin(ScrollTrigger);
     if (window.SplitText) gsap.registerPlugin(SplitText);
 
@@ -284,7 +287,30 @@ function init() {
             const length = path.getTotalLength ? Math.ceil(path.getTotalLength()) : 7500;
             gsap.set(path, { strokeDasharray: length, strokeDashoffset: length, strokeWidth: 0 });
             gsap.timeline({
-                scrollTrigger: { trigger: '.manifesto', start: 'top top', end: '+=90%', scrub: 0.6, pin: true, anticipatePin: 1 }
+                scrollTrigger: {
+                    trigger: '.manifesto',
+                    start: 'top top',
+                    end: '+=90%',
+                    scrub: 0.6,
+                    pin: true,
+                    anticipatePin: 1,
+                    onUpdate: (self) => {
+                        // When blue paint sweeps past the top (25%), turn header logo white!
+                        if (self.progress > 0.22) {
+                            if (!manifestoDark) {
+                                manifestoDark = true;
+                                $('.header').classList.add('light');
+                            }
+                        } else {
+                            if (manifestoDark) {
+                                manifestoDark = false;
+                                if (activeDarkSections.size === 0) {
+                                    $('.header').classList.remove('light');
+                                }
+                            }
+                        }
+                    }
+                }
             })
             .to(path, { strokeDashoffset: 0, strokeWidth: 25, duration: 0.6, ease: 'none' }, 0)
             .to(path, { strokeWidth: 540, duration: 0.8, ease: 'none' }, 0.2);
@@ -407,7 +433,6 @@ function init() {
     }
 
     // High-performance Header Theme Toggle (Zero reflow / Zero getBoundingClientRect)
-    const activeDarkSections = new Set();
     const darkSections = ['.services', '.contact', '.footer-wrap'];
 
     darkSections.forEach(sel => {

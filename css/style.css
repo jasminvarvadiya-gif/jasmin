@@ -132,11 +132,31 @@ img {
     letter-spacing: -.065em;
     transform-origin: top left;
     color: var(--ink);
-    z-index: 10
+    z-index: 10;
+    transition: color 0.35s ease;
 }
 
 .header.light .name {
-    color: var(--silver)
+    color: var(--silver) !important;
+}
+
+.header.light .button.black {
+    background: transparent;
+    border: 1px solid rgba(226, 225, 225, 0.45);
+    color: var(--silver);
+}
+
+.header.light .button.black:before {
+    background: var(--silver);
+}
+
+.header.light .button.black:hover {
+    color: var(--ink);
+    border-color: var(--silver);
+}
+
+.header.light .button.blue {
+    border: 1px solid rgba(226, 225, 225, 0.35);
 }
 
 .button {
