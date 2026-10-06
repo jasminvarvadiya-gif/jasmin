@@ -137,7 +137,7 @@ img {
 }
 
 .header.light .name {
-    color: var(--silver) !important;
+    color: #ffffff !important;
 }
 
 .header.light .button.black {

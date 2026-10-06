@@ -135,6 +135,16 @@ function init() {
     const activeDarkSections = new Set();
     let manifestoDark = false;
 
+    function updateHeaderLight() {
+        const header = $('.header');
+        if (!header) return;
+        if (activeDarkSections.size > 0 || manifestoDark) {
+            header.classList.add('light');
+        } else {
+            header.classList.remove('light');
+        }
+    }
+
     gsap.registerPlugin(ScrollTrigger);
     if (window.SplitText) gsap.registerPlugin(SplitText);
 
@@ -299,16 +309,22 @@ function init() {
                         if (self.progress > 0.22) {
                             if (!manifestoDark) {
                                 manifestoDark = true;
-                                $('.header').classList.add('light');
+                                updateHeaderLight();
                             }
                         } else {
                             if (manifestoDark) {
                                 manifestoDark = false;
-                                if (activeDarkSections.size === 0) {
-                                    $('.header').classList.remove('light');
-                                }
+                                updateHeaderLight();
                             }
                         }
+                    },
+                    onLeave: () => {
+                        manifestoDark = false;
+                        updateHeaderLight();
+                    },
+                    onEnterBack: () => {
+                        manifestoDark = true;
+                        updateHeaderLight();
                     }
                 }
             })
@@ -339,7 +355,23 @@ function init() {
                     pin: true,
                     scrub: 0.6,
                     invalidateOnRefresh: true,
-                    anticipatePin: 1
+                    anticipatePin: 1,
+                    onEnter: () => {
+                        activeDarkSections.add('.services');
+                        updateHeaderLight();
+                    },
+                    onLeave: () => {
+                        activeDarkSections.delete('.services');
+                        updateHeaderLight();
+                    },
+                    onEnterBack: () => {
+                        activeDarkSections.add('.services');
+                        updateHeaderLight();
+                    },
+                    onLeaveBack: () => {
+                        activeDarkSections.delete('.services');
+                        updateHeaderLight();
+                    }
                 }
             });
 
@@ -351,7 +383,39 @@ function init() {
             });
 
             return () => {
+                activeDarkSections.delete('.services');
+                updateHeaderLight();
                 gsap.set(['.services', '.services-list', ...visuals, ...imgs], { clearProps: 'height,width,left,transform' });
+            };
+        });
+
+        // Services Scroll for Tablet / Mobile (<992px)
+        mm.add('(max-width: 991px)', () => {
+            const st = ScrollTrigger.create({
+                trigger: '.services',
+                start: 'top 50px',
+                end: 'bottom 50px',
+                onEnter: () => {
+                    activeDarkSections.add('.services');
+                    updateHeaderLight();
+                },
+                onLeave: () => {
+                    activeDarkSections.delete('.services');
+                    updateHeaderLight();
+                },
+                onEnterBack: () => {
+                    activeDarkSections.add('.services');
+                    updateHeaderLight();
+                },
+                onLeaveBack: () => {
+                    activeDarkSections.delete('.services');
+                    updateHeaderLight();
+                }
+            });
+            return () => {
+                activeDarkSections.delete('.services');
+                updateHeaderLight();
+                st.kill();
             };
         });
 
@@ -433,7 +497,7 @@ function init() {
     }
 
     // High-performance Header Theme Toggle (Zero reflow / Zero getBoundingClientRect)
-    const darkSections = ['.services', '.contact', '.footer-wrap'];
+    const darkSections = reduced ? ['.services', '.contact', '.footer-wrap'] : ['.contact', '.footer-wrap'];
 
     darkSections.forEach(sel => {
         ScrollTrigger.create({
@@ -442,19 +506,19 @@ function init() {
             end: 'bottom 50px',
             onEnter: () => {
                 activeDarkSections.add(sel);
-                $('.header').classList.add('light');
+                updateHeaderLight();
             },
             onLeave: () => {
                 activeDarkSections.delete(sel);
-                if (activeDarkSections.size === 0) $('.header').classList.remove('light');
+                updateHeaderLight();
             },
             onEnterBack: () => {
                 activeDarkSections.add(sel);
-                $('.header').classList.add('light');
+                updateHeaderLight();
             },
             onLeaveBack: () => {
                 activeDarkSections.delete(sel);
-                if (activeDarkSections.size === 0) $('.header').classList.remove('light');
+                updateHeaderLight();
             }
         });
     });
