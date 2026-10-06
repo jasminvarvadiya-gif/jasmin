@@ -609,8 +609,7 @@ img {
     overflow: hidden;
     transform: translate(-50%, -50%);
     background: #d0d0d0;
-    box-shadow: 0 15px 35px #0809121a;
-    will-change: transform, filter, opacity
+    will-change: transform, opacity;
 }
 
 .orbit-card a {
