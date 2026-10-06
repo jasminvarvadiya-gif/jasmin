@@ -251,15 +251,16 @@ function init() {
 
             $$('[data-scatter]').forEach(el => {
                 SplitText.create(el, {
-                    type: 'chars',
+                    type: 'words,chars',
+                    autoSplit: true,
                     onSplit: split => gsap.from(split.chars, {
-                        x: () => gsap.utils.random(-140, 140),
-                        y: () => gsap.utils.random(-140, 140),
-                        rotation: () => gsap.utils.random(-80, 80),
-                        scale: () => gsap.utils.random(0.6, 1.3),
-                        opacity: 0.1,
+                        x: () => gsap.utils.random(-120, 120),
+                        y: () => gsap.utils.random(-120, 120),
+                        rotation: () => gsap.utils.random(-60, 60),
+                        scale: () => gsap.utils.random(0.7, 1.3),
+                        opacity: 0,
                         stagger: { each: 0.02, from: 'random' },
-                        scrollTrigger: { trigger: el, start: 'top bottom', end: 'top 20%', scrub: 0.5 }
+                        scrollTrigger: { trigger: el, start: 'top bottom', end: 'top 25%', scrub: 0.5 }
                     })
                 });
             });
@@ -277,16 +278,16 @@ function init() {
             });
         });
 
-        // Manifesto Paint Path
+        // Manifesto Paint Path — Exact dynamic length so no premature blue lines appear
         const path = $('.paint path');
         if (path) {
-            const length = 3800;
-            gsap.set(path, { strokeDasharray: length, strokeDashoffset: length, strokeWidth: 20 });
+            const length = path.getTotalLength ? Math.ceil(path.getTotalLength()) : 7500;
+            gsap.set(path, { strokeDasharray: length, strokeDashoffset: length, strokeWidth: 0 });
             gsap.timeline({
                 scrollTrigger: { trigger: '.manifesto', start: 'top top', end: '+=90%', scrub: 0.6, pin: true, anticipatePin: 1 }
             })
-            .to(path, { strokeDashoffset: 0, duration: 1, ease: 'none' }, 0)
-            .to(path, { strokeWidth: 420, duration: 0.8, ease: 'none' }, 0.2);
+            .to(path, { strokeDashoffset: 0, strokeWidth: 25, duration: 0.6, ease: 'none' }, 0)
+            .to(path, { strokeWidth: 540, duration: 0.8, ease: 'none' }, 0.2);
         }
 
         // Services Horizontal Scroll (Desktop)
