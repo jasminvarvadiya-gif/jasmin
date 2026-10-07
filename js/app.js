@@ -1,4 +1,11 @@
 // Jasmin Varvadiya Portfolio — High Performance, Lag-Free Engine
+// EmailJS — Initialize after full page load
+window.addEventListener('load', function () {
+    if (window.emailjs) {
+        emailjs.init('unJJp2xtKYdyB3OUJ');
+    }
+});
+
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 
@@ -724,27 +731,71 @@ if (modalContainer) {
     }, { passive: false });
 }
 
-// Form Submission with Signature Paint Transition
+// Form Submission with EmailJS + Signature Paint Transition
 const contactForm = $('#contactForm');
 if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
+    contactForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitBtn = $('#submitBtn');
-        if (submitBtn) submitBtn.disabled = true;
+        const formStatus = $('#formStatus');
 
-        triggerServicePaintTransition({
-            tag: '[ service ]',
-            title: 'THANK YOU! [JV]',
-            onPeak: () => {
-                const modal = $('#contactModal');
-                if (modal) modal.setAttribute('hidden', '');
-                document.body.classList.remove('modal-open');
-                contactForm.reset();
-                if (submitBtn) submitBtn.disabled = false;
-            },
-            onComplete: () => {
-                if (window.lenis) lenis.start();
+        // Basic validation
+        const name = $('#formName').value.trim();
+        const email = $('#formEmail').value.trim();
+        const phone = $('#formPhone').value.trim();
+        const message = $('#formMessage').value.trim();
+        if (!name || !email || !phone || !message) return;
+
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.querySelector('span').textContent = 'Sending…';
+        }
+        if (formStatus) formStatus.textContent = '';
+
+        try {
+            await emailjs.send(
+                'service_eerr9wk',
+                'template_lvnvy47',
+                {
+                    from_name: name,
+                    from_email: email,
+                    phone: phone,
+                    message: message,
+                    reply_to: email
+                }
+            );
+
+            // ✅ Success — paint transition + thank you
+            triggerServicePaintTransition({
+                tag: '[ message sent ]',
+                title: 'THANK YOU! [JV]',
+                onPeak: () => {
+                    const modal = $('#contactModal');
+                    if (modal) modal.setAttribute('hidden', '');
+                    document.body.classList.remove('modal-open');
+                    contactForm.reset();
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.querySelector('span').textContent = 'Submit message →';
+                    }
+                    if (formStatus) formStatus.textContent = '';
+                },
+                onComplete: () => {
+                    if (window.lenis) lenis.start();
+                }
+            });
+
+        } catch (err) {
+            // ❌ Error — show inline message, re-enable button
+            if (formStatus) {
+                formStatus.textContent = 'Oops! Something went wrong. Please try again.';
+                formStatus.style.color = '#e74c3c';
             }
-        });
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.querySelector('span').textContent = 'Submit message →';
+            }
+            console.error('EmailJS error:', err);
+        }
     });
 }
